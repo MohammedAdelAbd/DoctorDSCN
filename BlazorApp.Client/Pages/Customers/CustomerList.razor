@@ -1,0 +1,86 @@
+﻿@page "/CustomerList"
+@using BlazorApp.Client.Services;
+@using Microsoft.AspNetCore.Authorization;
+@layout MainLayout
+@inject ICustomerService userCustomerService;
+@inject NavigationManager Nav
+
+@* @attribute [Authorize] *@
+
+<h3>Customer List</h3>
+@if (customers != null)
+{
+    <table class="table">
+        <tr>
+            <th>Costomer Certificate</th>
+            <th>Costomer Adress Job</th>
+            <th>Costomer Specialization</th>
+            <th>Costomer Scientific Title</th>
+            <th>New Customer</th> 
+            <th></th>
+        </tr>
+        @foreach (var cust in customers)
+        {
+            <tr>
+                <td>@cust.customerCertificate</td>
+                <td>@cust.customerAddressJob</td>
+                <td>@cust.customerSpecilaztion</td>
+                <td>@cust.customerScientificTitle</td>
+                <td>@(cust.NewCustomer ? "Yes" : "No")</td>
+                @* <td>
+                @if (cust.Products.Any())
+                {
+                    <ul>
+                        @foreach (var item in cust.Products)
+                        {
+                            <li>@item.ProductName</li>
+                        }
+                    </ul>
+                } 
+            </td> *@
+                <td>
+                    <a href="@($"updateform/{cust.customerId}")" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">Edit</a>
+                    <a href="@($"deleteCust/{cust.customerId}")" class="btn btn-danger btn-sm active" role="button" aria-pressed="true">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+
+    <button class="btn btn-primary" @onclick=goToAddCustomer>Add New Product</button>
+
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <Spinner Type="SpinnerType.Border" />
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    List<Customer> customers; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await userCustomerService.GetAllUsersCust();
+        // var user = (await AuthState).User;
+        // if (user!.Identity!.IsAuthenticated)
+        // {
+        //     customers = await userCustomerService.GetAllUsersCust();
+
+        // }
+        // else
+        // {
+
+
+        //     await base.OnInitializedAsync();
+        // }
+    }
+
+    public void goToAddCustomer()
+    {
+        Nav.NavigateTo("/usercustomer");
+    }
+}

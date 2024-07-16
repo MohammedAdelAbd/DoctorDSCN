@@ -1,0 +1,80 @@
+﻿@page "/updateform"
+@page "/updateform/{cusId}"
+@using BlazorApp.Client.Services;
+@using System.Text.Json;
+@using System.Text;
+@using static System.Net.WebRequestMethods;
+@layout MainLayout
+@inject ICustomerService userCustomerService
+@inject NavigationManager Nav
+@inject HttpClient httpclient
+
+<h3>CustomerEditForm</h3>
+
+@if (usersCust != null)
+{
+    <EditForm Model="usersCust" OnSubmit="HandleValidSubmit">
+        <div class="form-group">
+            <label for="InputCustomerCertificate">Customer Certificate</label>
+            <input type="text" class="form-control" id="InputCustomerCertificate" @bind-value=usersCust.customerCertificate placeholder="Enter Customer Certificate">
+        </div>
+        <div class="form-group">
+            <label for="InputcustomerAddressJob">Customer Address Job</label>
+            <input type="text" class="form-control" id="InputcustomerAddressJob" @bind-value=usersCust.customerAddressJob placeholder="Enter Address Job">
+        </div>
+        <div class="form-group">
+            <label for="InputcustomerSpecilaztion">Customer Specilaztion</label>
+            <input type="text" class="form-control" id="InputcustomerSpecilaztion" @bind-value=usersCust.customerSpecilaztion placeholder="Enter Customer Specilaztion">
+        </div>
+        <div class="form-group">
+            <label for="InputcustomerScientificTitle">Customer Scientific Title</label>
+            <input type="text" class="form-control" id="InputcustomerScientificTitle" @bind-value=usersCust.customerScientificTitle placeholder="Enter Customer Specilaztion">
+        </div>
+        <div class="form-group row mb-3">
+            <label class="col-md-2 col-form-label">New Customer</label>
+            <div class="col-md-10">
+                <Switch Class="mt-2" @bind-Value="usersCust.NewCustomer" />
+            </div>
+        </div>
+        <input type="submit" value="Update Customer" class="btn btn-outline-warning" />
+        <a href="/CustomerList" class="btn btn-primary">Back</a>
+
+    </EditForm>
+
+    <div>@message</div>
+}
+@code {
+
+
+    [Parameter]
+    public string cusId { get; set; }
+
+    string message = "";
+    bool saved = false;
+
+    private Customer usersCust;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usersCust = await userCustomerService.getUserCustById(cusId);
+
+         
+    }
+
+    public async Task HandleValidSubmit()
+    {
+
+        var response = await userCustomerService.UpdateUserCustomer(cusId,usersCust);
+        if (response == true)
+        {
+            message = "Customer Updated successfully!";
+            saved = true;
+        }
+        else
+        {
+            message = "Error Updated customer";
+            saved = false;
+
+        }
+    }
+}

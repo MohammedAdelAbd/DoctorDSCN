@@ -1,0 +1,11 @@
+D:\ConsolesApp\BlazorFront\SharedLibrary\bin\Debug\net7.0\SharedLibrary.deps.json
+D:\ConsolesApp\BlazorFront\SharedLibrary\bin\Debug\net7.0\SharedLibrary.dll
+D:\ConsolesApp\BlazorFront\SharedLibrary\bin\Debug\net7.0\SharedLibrary.pdb
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\SharedLibrary.GeneratedMSBuildEditorConfig.editorconfig
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\SharedLibrary.AssemblyInfoInputs.cache
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\SharedLibrary.AssemblyInfo.cs
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\SharedLibrary.csproj.CoreCompileInputs.cache
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\SharedLibrary.dll
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\refint\SharedLibrary.dll
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\SharedLibrary.pdb
+D:\ConsolesApp\BlazorFront\SharedLibrary\obj\Debug\net7.0\ref\SharedLibrary.dll

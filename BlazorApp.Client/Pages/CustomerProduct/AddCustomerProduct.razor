@@ -1,0 +1,18 @@
+﻿@page "/addcustomerproduct"
+@page "/addcustomerproduct/{prodId}"
+@layout MainLayout
+
+<h3>AddCustomerProduct</h3>
+
+
+
+
+@code {
+    [Parameter]
+    public string prodId { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+}

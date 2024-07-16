@@ -1,0 +1,79 @@
+﻿@inherits LayoutComponentBase
+@using BlazorApp.Client.Provider;
+@using Blazored.LocalStorage;
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims;
+@inject ILocalStorageService localStorageService
+@inject  AuthenticationStateProvider authStateProvider
+
+<div class="bb-page">
+    <Sidebar @ref="sidebar"
+             IconName="IconName.BootstrapFill"
+             Title="Doctor DSCN"
+             DataProvider="SidebarDataProvider" />
+
+    @* <div class="sidebar">
+        <NavMenu />
+    </div> *@
+    <main>
+        <div class="bb-top-row px-4 d-flex justify-content-end">
+            
+
+            <AuthorizeView>
+                <Authorized>
+                    @DisplayInfo(context.User.Claims.ToList())
+                     
+                    <a @onclick="Logout" href="login">Logout</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="login">Login</a>
+                    <a href="register">Register</a>
+                </NotAuthorized>
+            </AuthorizeView>
+             
+        </div>
+
+        <article class="content px-4">
+            <div class="py-2">
+                @Body
+            </div>
+        </article>
+    </main>
+</div>
+
+@code {
+    private Sidebar sidebar = default!;
+    private IEnumerable<NavItem> navItems = default!;
+    private async Task<SidebarDataProviderResult> SidebarDataProvider(SidebarDataProviderRequest request)
+    {
+        if (navItems is null)
+            navItems = GetNavItems();
+        return await Task.FromResult(request.ApplyTo(navItems));
+    }
+    private IEnumerable<NavItem> GetNavItems()
+    {
+        navItems = new List<NavItem>
+        {
+            new NavItem { Id = "1", Href = "/index", IconName = IconName.HouseDoorFill, Text = "Home", Match=NavLinkMatch.All,IconColor= IconColor.Primary},
+            new NavItem { Id = "2", Href = "/dashboard", IconName = IconName.HouseDoorFill, Text = "Dashboard", Match=NavLinkMatch.All,IconColor= IconColor.Primary},
+            new NavItem { Id = "3", Href = "/CustomerList", IconName = IconName.Person, Text = "Customers",IconColor= IconColor.Primary},
+            new NavItem { Id = "4", Href = "/productList", IconName = IconName.Clock, Text = "Products",IconColor= IconColor.Primary},
+            new NavItem { Id = "5", Href = "/UserList", IconName = IconName.PersonBadge, Text = "Users",IconColor= IconColor.Primary},
+        };
+        return navItems;
+    }
+
+
+    private string DisplayInfo(List<Claim> claims)
+    {
+        var fullname = claims.Where(u => u.Type.Equals("userName")).Select(u => u.Value).FirstOrDefault();
+        return fullname!;
+    }
+
+    private async void Logout()
+    {
+        await localStorageService.RemoveItemAsync("UserData");
+        var cs = (CustomAuthenticationStateProvider)authStateProvider;
+        cs.NotifyAuthenticationState();
+    }
+}

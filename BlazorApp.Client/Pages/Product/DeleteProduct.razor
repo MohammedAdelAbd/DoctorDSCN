@@ -1,0 +1,67 @@
+﻿@page "/deleteProd"
+@page "/deleteProd/{prodId}"
+@using BlazorApp.Client.Services;
+@layout MainLayout
+
+@inject IUserProductService userProductService
+@inject NavigationManager Nav
+
+<h3 class="alert alert-danger">Are You Sure For Deleted The Product </h3>
+@if (userProduct != null)
+{
+    <button Class="btn btn-danger" type="button" @onclick="@onDeleteProduct">Delete</button>
+}
+<br />
+<br />
+<br />
+@if (seccessFlag == false)
+{
+    <div class="@cssCflass">@message</div>
+     
+}
+else
+{ 
+    <div class="@cssCflass">@message</div>
+    <a class="btn btn-primary" href="/productList">Back</a>
+}
+ 
+
+@code {
+
+
+    [Parameter]
+    public string prodId { get; set; }
+    private  Product userProduct;
+
+    string cssCflass="";
+    string message;
+    bool seccessFlag;
+
+    protected async override Task OnInitializedAsync()
+    {
+        userProduct = await userProductService.GetUserProdById(prodId);
+
+    }
+
+    public async Task  onDeleteProduct()
+    {
+        var response = await userProductService.RemoveUserProd(userProduct.productId);
+        if (response == true)
+        {
+            message = "Delete Product Seccessfully";
+            cssCflass = "alert alert-success";
+            seccessFlag = true;
+
+        } else
+        {
+            message = "Deleted Not Seccessfully";
+            cssCflass = "alert alert-danger";
+            seccessFlag = false;
+
+        }
+
+    }
+
+
+
+}

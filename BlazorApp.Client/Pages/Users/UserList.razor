@@ -1,0 +1,67 @@
+﻿@page "/UserList"
+@using BlazorApp.Client.Services;
+@using Microsoft.AspNetCore.Authorization;
+@layout MainLayout
+@inject IUserService userService
+@inject IUserInfoService userInfoService
+
+@* @attribute [Authorize(Roles ="Admin")] *@
+
+
+<h3>UserList</h3>
+@if (users != null)
+{
+    <div class="card-group">
+        @foreach (var user in users)
+        {
+            <div class="card">
+                 
+                <div class="card-body">
+                    <h5 class="card-title">@user.UserName</h5>
+                     
+                     <a href = "@($"/usereditform/{ user.UserID}")" class="btn btn-warning">Edit</a>
+                </div>
+            </div>
+        }
+    </div>
+   
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <Spinner Type="SpinnerType.Border" />
+    </div>  
+}
+
+
+@code {
+
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+    
+    List<User> users;
+     
+    protected override async Task OnInitializedAsync()
+    {
+       
+        var user = (await AuthState).User;
+        if (user!.Identity!.IsAuthenticated)
+        {
+            users = await userService.GetAllUsers();
+        }else
+        {
+
+
+            await base.OnInitializedAsync();
+        }
+        
+    }
+
+    // public object getPhoto(Guid PhotoId)
+    // {
+    //       var photo = userIfoService.Where(x => x.UserID == PhotoId).Select(u => u.InfoImage);
+
+    //       return null;
+    // }
+}

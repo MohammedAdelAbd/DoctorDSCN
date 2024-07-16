@@ -1,0 +1,68 @@
+﻿@page "/productAddForm"
+@using BlazorApp.Client.Services;
+ @inject NavigationManager Nav
+@layout MainLayout
+@inject IUserProductService userProductService
+<h3>ProductForm</h3>
+@if (userProduct != null)
+{
+    <EditForm Model="userProduct" OnSubmit="PostProductData">
+        <div class="form-group">
+            <lable class="form-label">Product Name:</lable>
+            <InputText class="form-control" @bind-Value=@userProduct.productName></InputText>
+        </div>
+        <div class="form-group">
+            <lable class="form-label">Product Type:</lable>
+            <InputText class="form-control" @bind-Value=@userProduct.productType></InputText>
+        </div>
+        <br>
+        <div class="form-group">
+        
+        <input type="submit" value="Add Product" class="btn btn-outline-warning" />
+            <a href="/ProductList" class="btn btn-primary">Back</a>
+
+        </div>
+
+    </EditForm>
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <Spinner Type="SpinnerType.Border" />
+    </div>
+}
+
+
+ 
+
+
+@code {
+    private  Product userProduct = new  Product();
+    string message;
+
+    protected override Task OnInitializedAsync()
+    {
+
+        return base.OnInitializedAsync();
+    }
+
+
+    public async Task  PostProductData()
+    {
+        var response = await userProductService.AddUserProd(userProduct);
+        if (response == true)
+        {
+            message = "Product is Added seccess";
+            Nav.NavigateTo("/ProductList");
+             
+        }else
+        {
+            message = "Product is Not seccess";
+
+            
+        }
+        
+
+    }
+
+}

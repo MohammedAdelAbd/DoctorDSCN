@@ -1,0 +1,9 @@
+﻿<h3>RedirectToLogin</h3>
+@inject NavigationManager Nav
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        Nav.NavigateTo("/login");
+        return base.OnInitializedAsync();
+    }
+}

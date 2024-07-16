@@ -1,0 +1,52 @@
+﻿@page "/editformprod"
+@page "/editformprod/{prodId}"
+@layout MainLayout
+@using BlazorApp.Client.Services;
+@inject IUserProductService userProductService
+<h3>ProductEditForm</h3>
+ 
+@if (userProduct != null)
+{
+    <EditForm Model="userProduct" OnSubmit="EditProductData">
+        <div class="form-group">
+            <lable class="form-label">Product Name:</lable>
+            <InputText class="form-control" @bind-Value=@userProduct.productName></InputText>
+        </div>
+        <div class="form-group">
+            <lable class="form-label">Product Type:</lable>
+            <InputText class="form-control" @bind-Value=@userProduct.productType></InputText>
+        </div>
+        <br>
+        <div class="form-group">
+
+            <input type="submit" value="Edit Product" class="btn btn-outline-warning" />
+            <a href="/ProductList" class="btn btn-primary">Back</a>
+        </div>
+
+    </EditForm>
+    <div>@message</div>
+}
+@code {
+    [Parameter]
+    public string prodId { get; set; }
+    private  Product userProduct;
+    string message;
+    protected override async Task OnInitializedAsync()
+    {
+        userProduct = await userProductService.GetUserProdById(prodId);
+    }
+
+    public async Task EditProductData()
+    {
+        var response = await userProductService.UpdateUserProd(prodId, userProduct);
+
+        if (response == true)
+        {
+            message = "Product Updated Seccessfully";
+        }else
+        {
+            message = "Product Not Updated Seccessfully";
+
+        }
+    }
+}

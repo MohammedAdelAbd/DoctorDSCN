@@ -1,0 +1,11 @@
+﻿@page "/usereditform"
+@page "/usereditform/{productId}"
+@layout MainLayout
+
+<h3>UserEditForm</h3>
+
+@code {
+    [Parameter]
+    public string productId { get; set; }
+
+}

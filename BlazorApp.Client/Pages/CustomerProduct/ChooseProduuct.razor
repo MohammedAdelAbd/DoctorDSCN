@@ -1,0 +1,97 @@
+﻿@page "/chooseprod"
+@page "/chooseprod/{custoId}"
+
+@layout MainLayout
+@using BlazorApp.Client.Services;
+@inject ICustomerProductService customerProductService
+@inject IUserProductService userProductService
+@inject NavigationManager Nav
+
+<h3>Customer Have a Product</h3>
+@if (customerProduct != null)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td> Customer</td>
+                <td> Product</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in customerProduct)
+            {
+                <tr>
+                    <td>@item.userCustomer.customerCertificate</td>
+                    <td>@item.userProduct.productName</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    if (ProductWithoutCustomer != null)
+    {
+        <h3> a Product Is Not Chooses</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td> Product Name</td>
+                    <td> Product Type</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ProductWithoutCustomer)
+                {
+                    <tr>
+                        <td>@item.productName</td>
+                        <td>@item.productType</td>
+                        <a @onclick="() => AddCustomerProduct(custoId, item.productId)" class="btn btn-danger btn-sm active" role="button" aria-pressed="true">choose</a>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}else
+{
+    <div class="d-flex justify-content-center">
+        <Spinner Type="SpinnerType.Border" />
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public string custoId { get; set; }
+
+
+    List<CustomerProduct> customerProduct;
+    List<Product> ProductWithoutCustomer;
+    protected override async Task  OnInitializedAsync()
+    {
+        customerProduct =  await customerProductService.GetAllCustProd();
+        ProductWithoutCustomer = await userProductService.GetCustProdWithoutCustomer();    
+    } 
+
+
+    private async Task AddCustomerProduct(string customerId, Guid productId)
+    {
+
+
+        var customerProduct = new CustomerProduct()
+            {
+                CustomerProductId = Guid.NewGuid(),
+                productId = productId,
+                customerId = Guid.Parse(customerId),
+                userCustomer = null,
+                userProduct = null
+            };
+        var response = await customerProductService.AddCustProduct(customerProduct);
+
+        if (response == true)
+        {
+            Nav.NavigateTo("/addcustomerproduct");
+        }
+
+    }
+
+}

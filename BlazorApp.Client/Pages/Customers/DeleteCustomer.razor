@@ -1,0 +1,67 @@
+﻿@page "/deleteCust"
+@page "/deleteCust/{cusId}"
+@using BlazorApp.Client.Services;
+@layout MainLayout
+
+@inject ICustomerService userCustomerService
+@inject NavigationManager Nav
+
+<h3 class="alert alert-danger">Are You Sure For Deleted The Customer </h3>
+@if (userCustomer != null)
+{
+    <button Class="btn btn-danger" type="button" @onclick="@onDeleteCustomer">Delete</button>
+}
+<br />
+<br />
+<br />
+@if (seccessFlag == false)
+{
+    <div class="@cssCflass">@message</div>
+     
+}
+else
+{ 
+    <div class="@cssCflass">@message</div>
+    <a class="btn btn-primary" href="/customerList">Back</a>
+}
+ 
+
+@code {
+
+
+    [Parameter]
+    public string cusId { get; set; }
+    private Customer userCustomer;
+
+    string cssCflass="";
+    string message;
+    bool seccessFlag;
+
+    protected async override Task OnInitializedAsync()
+    {
+        userCustomer = await userCustomerService.getUserCustById(cusId);
+
+    }
+
+    public async Task onDeleteCustomer()
+    {
+        var response = await userCustomerService.RemoveUserCustomer(userCustomer.customerId);
+        if (response == true)
+        {
+            message = "Delete Customer Seccessfully";
+            cssCflass = "alert alert-success";
+            seccessFlag = true;
+
+        } else
+        {
+            message = "Deleted Not Seccessfully";
+            cssCflass = "alert alert-danger";
+            seccessFlag = false;
+
+        }
+
+    }
+
+
+
+}

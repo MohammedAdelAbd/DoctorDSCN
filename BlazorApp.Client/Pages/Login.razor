@@ -1,0 +1,185 @@
+﻿@page "/login"
+@page "/login/{cusId:guid}"
+
+@using Blazor.SubtleCrypto;
+@using BlazorApp.Client.Provider;
+@using BlazorApp.Client.Services;
+@using Blazored.LocalStorage;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Authorization;
+@layout LandingPageLayout
+@inject IJSRuntime js
+@inject NavigationManager Nav
+@inject IUserService userService
+@inject ILocalStorageService localStorageService
+@inject AuthenticationStateProvider _authStateProvider
+@inject ICryptoService Crypto
+
+@if(user != null)
+{
+    <div class="bg-light py-3 py-md-5">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-12 col-md-11 col-lg-8 col-xl-7 col-xxl-6">
+                    <div class="bg-white p-4 p-md-5 rounded shadow-sm">
+                        <div class="row">
+
+                            <div class="img-thumbnail img-responsive rounded mx-auto d-block">
+                                <img src="../images/arabic_page-0001.jpg" style="width:100%" />
+                            </div>
+
+                        </div>
+                        <br />
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center">
+                                <h3>Log in</h3>
+                            </div>
+                        </div>
+                        <EditForm Model="user" OnSubmit="HandleSubmit">
+                            <div class="row gy-3 gy-md-4 overflow-hidden">
+                                <div class="col-12">
+                                    <label for="User" class="form-label">Username <span class="text-danger">*</span></label>
+                                    <input type="User" class="form-control" name="User" id="User" placeholder="Enter Your Username" required @bind-value=user.UserName>
+                                </div>
+                                <div class="col-12">
+                                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" name="password" id="password" required @bind-value=user.UserPassword>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" name="remember_me" id="remember_me">
+                                        <label class="form-check-label text-secondary" for="remember_me">
+                                            Keep me logged in
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-grid">
+                                        <button class="btn btn-lg btn-primary" type="submit">Log in now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </EditForm>
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="mt-5 mb-4 border-secondary-subtle">
+                                <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-end">
+                                    <a href="/register" class="link-secondary text-decoration-none">Create new account</a>
+                                    <a href="#!" class="link-secondary text-decoration-none">Forgot password</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <p class="mt-5 mb-4">Or sign in with</p>
+                                <div class="d-flex gap-3 flex-column flex-md-row">
+                                    <div class="container">
+                                         
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <Spinner Type="SpinnerType.Border" />
+    </div>
+}
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+
+    [Parameter]
+    public Guid cusId { get; set; }
+
+    List<User> users;
+
+    private User user = new User();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        users = await userService.GetAllUsers();
+        // var user = (await AuthState).User;
+        // if (user!.Identity!.IsAuthenticated)
+        //    { 
+        //    Nav.NavigateTo("/UserList");
+        //    }else
+        //    {
+
+
+        //        await base.OnInitializedAsync();
+        //    }
+
+
+    }
+
+
+    // private async Task onLogin()
+    // {
+
+    //     user = users.FirstOrDefault(x => x.UserName == user.UserName && x.UserPassword == user.UserPassword);
+
+    //     if (user == null)
+    //     {
+    //         messageLogin = "Username or password Invalid";
+    //         wrongLogin = true;
+    //     }else
+
+
+    //     {
+    //         Nav.NavigateTo($"/usercustomer/{user.UserID}");
+    //     }
+    // }
+
+    private async Task HandleSubmit()
+    {
+
+        if (user is null)
+        {
+            return;
+        }
+
+
+
+
+
+        var result = await userService.LoginUser(user);
+
+        //add user id from here 
+        user = users.FirstOrDefault(x => x.UserName == user.UserName);
+
+
+
+
+        if (result.Token is not null || result.Username is not null || result.Role is not null)
+        {
+            CryptoResult encryptedUsername = await Crypto.EncryptAsync(result.Username);
+            CryptoResult encryptedRole = await Crypto.EncryptAsync(result.Role);
+            var newEncryptedUserSession = new Response() { Role = encryptedRole.Value, Username = encryptedUsername.Value, Token = result.Token };
+            await localStorageService.SetItemAsync("UserData", newEncryptedUserSession);
+            (_authStateProvider as CustomAuthenticationStateProvider).NotifyAuthenticationState();
+
+            
+
+             
+
+            Nav.NavigateTo($"/usercustomer/{user.UserID}");
+            
+            
+        }else
+        {
+            await js.InvokeVoidAsync("alert", "Error occured while Authentication");
+        }
+    }
+
+}
